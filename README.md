@@ -29,9 +29,9 @@ Run the program with the desired command, such as:
 
 ## Future Goals
 
-    Cross-platform support.
-    Further improvements in UI/UX.
-    More features and functionalities, such as editing or deleting bookmarks.
+Cross-platform support.
+Further improvements in UI/UX.
+More features and functionalities, such as editing or deleting bookmarks.
 
 ## Notes
 
