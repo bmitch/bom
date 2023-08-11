@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define RED "\x1B[31m"
 #define RESET "\x1B[0m"
@@ -57,22 +58,43 @@ void addBookmark() {
 
     printf("Enter URL: ");
     fgets(newBookmark.url, sizeof(newBookmark.url), stdin);
-    strtok(newBookmark.url, "\n");
+    newBookmark.url[strcspn(newBookmark.url, "\n")] = 0; // Remove newline
 
-    printf("Enter title (optional): ");
+    printf("Enter Title (optional): ");
     fgets(newBookmark.title, sizeof(newBookmark.title), stdin);
-    strtok(newBookmark.title, "\n");
+    newBookmark.title[strcspn(newBookmark.title, "\n")] = 0; // Remove newline
 
-    printf("Enter tags (optional): ");
+    printf("Enter Tags (optional, separated by commas): ");
     fgets(newBookmark.tags, sizeof(newBookmark.tags), stdin);
-    strtok(newBookmark.tags, "\n");
+    newBookmark.tags[strcspn(newBookmark.tags, "\n")] = 0; // Remove newline
 
-    time_t t = time(NULL);
-    struct tm *tm_info = localtime(&t);
-    strftime(newBookmark.datetime, sizeof(newBookmark.datetime), "%Y-%m-%d %H:%M", tm_info);
+    // Adding date
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    strftime(newBookmark.datetime, sizeof(newBookmark.datetime), "%Y-%m-%d %H:%M", t);
 
-    SaveBookmarkToFile(newBookmark);
-    printf("Bookmark saved successfully.\n");
+    // Saving to file
+    FILE *file = fopen("bookmarks.txt", "a");
+    if (file == NULL) {
+        printf("Error opening bookmarks file.\n");
+        return;
+    }
+
+    fprintf(file, "%s\n", newBookmark.url);
+
+    if (strlen(newBookmark.title) > 0) {
+        fprintf(file, "[ %s ]\n", newBookmark.title);
+    }
+
+    if (strlen(newBookmark.tags) > 0) {
+        fprintf(file, "# %s\n", newBookmark.tags);
+    }
+
+    fprintf(file, "@ %s\n\n", newBookmark.datetime); // Adding an extra newline to separate bookmarks
+
+    fclose(file);
+
+    printf("Bookmark added successfully.\n");
 }
 
 void listBookmarks() {
@@ -83,29 +105,51 @@ void listBookmarks() {
     }
 
     char line[256];
-    int lineCount = 0;
+    char nextLine[256];
+    int bookmarkCount = 0;
+    bool firstBookmark = true;
+
     while (fgets(line, sizeof(line), file)) {
         // Remove newline character if it exists
         line[strcspn(line, "\n")] = 0;
 
-        switch (lineCount % 4) {
-            case 0:
-                printf(WHITE "URL: %s\n" RESET, line);
-                break;
-            case 1:
-                printf(BLUE "Title: %s\n" RESET, line);
-                break;
-            case 2:
-                printf(CYAN "Tags: %s\n" RESET, line);
-                break;
-            case 3:
-                printf(GREEN "Date added: %s\n" RESET, line);
-                printf("\n"); // Separating bookmarks with a newline
-                break;
-        }
+        // Skip empty lines
+        if (strlen(line) == 0) continue;
 
-        lineCount++;
+        if (line[0] != '[' && line[0] != '#' && line[0] != '@') {
+            if (!firstBookmark) {
+                printf("\n");
+            }
+            bookmarkCount++;
+            printf("\033[1;37m%d.\t\033[0m", bookmarkCount); // Bright white color for the number
+            fgets(nextLine, sizeof(nextLine), file); // Read the title line
+            nextLine[strcspn(nextLine, "\n")] = 0; // Remove newline character
+            printf(BLUE "%s\n" RESET, nextLine); // Print title
+            printf("\t" WHITE "%s\n" RESET, line); // Print URL
+            firstBookmark = false;
+        } else if (line[0] == '#') {
+            printf("\t" CYAN "# ");
+            // Print tags without commas, ignoring consecutive commas and spaces
+            bool prevCharWasCommaOrSpace = false;
+            for (int i = 1; line[i]; i++) {
+                if (line[i] != ',' && line[i] != ' ') {
+                    printf("%c", line[i]);
+                    prevCharWasCommaOrSpace = false;
+                } else if (!prevCharWasCommaOrSpace) {
+                    printf(" ");
+                    prevCharWasCommaOrSpace = true;
+                }
+            }
+            printf("\n" RESET);
+        } else if (line[0] == '@') {
+            // Ignoring the date added, as per your example
+        }
     }
 
     fclose(file);
 }
+
+
+
+
+

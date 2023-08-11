@@ -1,56 +1,43 @@
-# BOM - Simple Bookmark Manager
+# BOM - Bookmark Manager CLI Tool
 
-## Introduction
-
-BOM is a command-line tool designed to manage bookmarks in a simple and efficient way. The tool allows users to add and manage bookmarks, storing them in a plaintext file using a straightforward standard format.
-
-This project is a collaborative experiment, guided by the assistance of ChatGPT, an advanced AI developed by OpenAI. As someone who is not very experienced with C programming, I am leaning on ChatGPT to help build something useful while also learning and expanding knowledge in C.
-
-BOM is currently in the early stages of development, and things can and will change. Contributions, feedback, and suggestions are welcome!
+BOM is a simple command-line bookmark manager tool written in C. It stores bookmarks in a plaintext file using a simple standard format. This project is an experiment leaning on Chat GPT's guidance to build something useful, as the author is not very experienced with C.
 
 ## Features
 
-- **Add Bookmarks:** Prompted for the URL (required), title (optional), and tags (optional).
-- **Simple Storage:** Bookmarks are stored in a plaintext file with a simple standard format, consisting of the URL, title, tags, and the date/time the bookmark was added.
-- **Cross-Platform:** Initially developed for OSX with plans to support other platforms.
-
-## Format
-
-The standard format for storing bookmarks is as follows:
-
-```
-url
-title
-tags separated by commas
-datetime
-```
+- **Add bookmarks**: Easily add bookmarks with a URL, optional title, optional tags, and the date added.
+- **List bookmarks**: View all bookmarks with beautiful colored formatting.
+- **Simple plaintext storage**: Bookmarks are stored in a straightforward text file, using symbols to define different parts:
+    - First line: URL (required)
+    - Second line: Title (optional, wrapped in `[]`)
+    - Third line: Tags (optional, comma-separated, starting with `#`)
+    - Fourth line: Date added (optional, starting with `@`)
 
 ## Usage
 
 Compile the program using:
 
-```bash
-gcc -Wall -o bom bom.c
 ```
-
-Or use the provided Makefile:
-
-```bash
 make
 ```
 
-Add a new bookmark:
+Run the program with the desired command, such as:
 
 ```
 ./bom add
+./bom list
 ```
 
-Follow the prompts to enter the URL, title, and tags.
+## Future Goals
 
-## Contributing
+    Cross-platform support.
+    Further improvements in UI/UX.
+    More features and functionalities, such as editing or deleting bookmarks.
 
-Feel free to fork this repository, make changes, and submit pull requests. Any contributions to enhance the functionality or fix issues are appreciated.
+## Notes
+
+This project is in its early stages, and things can and will change. Contributions, suggestions, and feedback are welcome!
+Disclaimer
 
 ## Disclaimer
 
-This tool is part of a learning experiment and should be used with an understanding of its experimental nature. It may contain bugs, incomplete features, or other issues.
+This README documents ongoing development, and the actual functionality may vary. Check the source code for the most accurate information.
