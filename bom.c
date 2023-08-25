@@ -19,15 +19,19 @@ typedef struct {
     char datetime[20];
 } Bookmark;
 
-void SaveBookmarkToFile(Bookmark bookmark);
+char *getBookmarkFilePath();
+
+void SaveBookmarkToFile(Bookmark bookmark, const char *filePath);
 void addBookmark();
 void listBookmarks();
 
 int main(int argc, char *argv[]) {
+    char *filePath = getBookmarkFilePath();
+
     if (argc > 1 && strcmp(argv[1], "add") == 0) {
-        addBookmark();
+        addBookmark(filePath);
     } else if (argc > 1 && strcmp(argv[1], "list") == 0) {
-        listBookmarks();
+        listBookmarks(filePath);
     }
 
     else {
@@ -37,8 +41,13 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void SaveBookmarkToFile(Bookmark bookmark) {
-    FILE *file = fopen("bookmarks.txt", "a");
+char *getBookmarkFilePath() {
+    char *filePath = getenv("BOOKMARKS_FILE_PATH");
+    return (filePath != NULL) ? filePath : "bookmarks.txt";
+}
+
+void SaveBookmarkToFile(Bookmark bookmark, const char *filePath) {
+    FILE *file = fopen(filePath, "a");
     if (file == NULL) {
         printf("Error opening file.\n");
         return;
@@ -53,7 +62,7 @@ void SaveBookmarkToFile(Bookmark bookmark) {
     fclose(file);
 }
 
-void addBookmark() {
+void addBookmark(char *filePath) {
     Bookmark newBookmark;
 
     printf("Enter URL: ");
@@ -74,7 +83,7 @@ void addBookmark() {
     strftime(newBookmark.datetime, sizeof(newBookmark.datetime), "%Y-%m-%d %H:%M", t);
 
     // Saving to file
-    FILE *file = fopen("bookmarks.txt", "a");
+    FILE *file = fopen(filePath, "a");
     if (file == NULL) {
         printf("Error opening bookmarks file.\n");
         return;
@@ -97,8 +106,8 @@ void addBookmark() {
     printf("Bookmark added successfully.\n");
 }
 
-void listBookmarks() {
-    FILE *file = fopen("bookmarks.txt", "r");
+void listBookmarks(char *filePath) {
+    FILE *file = fopen(filePath, "r");
     if (file == NULL) {
         printf("Could not open bookmarks file.\n");
         return;
